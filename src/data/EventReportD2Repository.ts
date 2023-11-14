@@ -7,7 +7,7 @@ import { EventReport } from "domain/entities/EventReport";
 export class EventReportD2Repository implements EventReportRepository {
     constructor(private api: D2Api) {}
 
-    async getCorrupted(): Async<EventReport[]> {
+    async getAll(): Async<EventReport[]> {
         return await this.api.models.eventReports
             .get({
                 paging: false,

@@ -6,6 +6,11 @@ export class GetCorruptedEventReports {
     constructor(private eventReportRepository: EventReportRepository) {}
 
     execute(): Async<EventReport[]> {
-        return this.eventReportRepository.getCorrupted();
+        const eventReports$ = this.eventReportRepository.getAll();
+        const programStagesIds$ = eventReports$.then(eventReports =>
+            eventReports.map(r => r.programStage.id)
+        );
+        programStagesIds$.then(x => console.log(x));
+        return eventReports$;
     }
 }
