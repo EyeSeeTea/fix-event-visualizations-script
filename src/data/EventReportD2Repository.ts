@@ -8,15 +8,13 @@ export class EventReportD2Repository implements EventReportRepository {
     constructor(private api: D2Api) {}
 
     async getCorrupted(): Async<EventReport[]> {
-        const eventReports = await this.api.models.eventReports
+        return await this.api.models.eventReports
             .get({
                 paging: false,
                 fields: eventReportFields,
             })
-            .map(({ data }) => data.objects)
+            .map(({ data }) => data.objects.map(e => this.buildEventReport(e)))
             .getData();
-
-        return eventReports.map(e => this.buildEventReport(e));
     }
 
     private buildEventReport(d2EventReport: D2EventReport): EventReport {
