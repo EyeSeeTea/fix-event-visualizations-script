@@ -1,4 +1,3 @@
-import _ from "lodash";
 import { D2Api, MetadataPick } from "@eyeseetea/d2-api/2.36";
 import { Async } from "domain/entities/Async";
 import { UserRepository } from "domain/repositories/UserRepository";

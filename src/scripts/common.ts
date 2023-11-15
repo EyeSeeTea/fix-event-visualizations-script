@@ -1,5 +1,5 @@
 import { option, optional, string, Type } from "cmd-ts";
-import _ from "lodash";
+import _ from "../domain/entities/generic/Collection";
 import { D2Api } from "types/d2-api";
 import { isElementOfUnion } from "utils/ts-utils";
 
@@ -61,14 +61,6 @@ export const StringPairSeparatedByDash: Type<string, Pair> = {
     },
 };
 
-export const StringsSeparatedByCommas: Type<string, string[]> = {
-    async from(str) {
-        const values = _.compact(str.split(","));
-        if (_(values).isEmpty()) throw new Error("Value cannot be empty");
-        return values;
-    },
-};
-
 export const HierarchyLevel: Type<string, number> = {
     async from(str) {
         const n = Number(str);
@@ -80,14 +72,6 @@ export const HierarchyLevel: Type<string, number> = {
 export const OrgUnitPath: Type<string, string> = {
     async from(str) {
         if (!isOrgUnitPath(str)) throw new Error(`Not a dhis2 orgunit path: ${str}`);
-        return str;
-    },
-};
-
-export const IDString: Type<string, string> = {
-    async from(str) {
-        if (_(str).isEmpty()) throw new Error("Value cannot be empty");
-        if (str.length !== 11) throw new Error("ID must be 11 char long");
         return str;
     },
 };
@@ -109,15 +93,6 @@ function isUid(uid: string): boolean {
 
     return uid.length === 11 && isAlpha(uid[0]) && areAllAlnum(uid.slice(1));
 }
-
-export const IdsSeparatedByCommas: Type<string, string[]> = {
-    async from(str) {
-        const values = _.compact(str.split(","));
-        if (_(values).isEmpty()) throw new Error("Value cannot be empty");
-        if (!_.every(values, item => item.length === 11)) throw new Error("IDs must be 11 char long");
-        return values;
-    },
-};
 
 export const AuthString: Type<string, Auth> = {
     async from(str) {
