@@ -1,3 +1,4 @@
+import { isEmpty } from "lodash";
 import { Async } from "domain/entities/Async";
 import { EventReport } from "domain/entities/EventReport";
 import { EventReportRepository } from "domain/repositories/EventReportRepository";
@@ -5,12 +6,17 @@ import { EventReportRepository } from "domain/repositories/EventReportRepository
 export class GetCorruptedEventReports {
     constructor(private eventReportRepository: EventReportRepository) {}
 
-    execute(): Async<EventReport[]> {
-        const eventReports$ = this.eventReportRepository.getAll();
-        const programStagesIds$ = eventReports$.then(eventReports =>
-            eventReports.map(r => r.programStage.id)
+    async execute(): Async<EventReport[]> {
+        const eventReports = (await this.eventReportRepository.getAll()).filter(
+            ev => !isEmpty(ev.dataElementDimensions)
         );
-        programStagesIds$.then(x => console.log(x));
-        return eventReports$;
+
+        const corruptedEventReports = eventReports.filter(
+            ev => !ev.dataElementDimensions.map(pair => pair.programStage.id).includes(ev.programStage.id)
+        );
+
+        console.log(corruptedEventReports.length);
+
+        return eventReports;
     }
 }

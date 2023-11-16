@@ -15,7 +15,7 @@ export function getCommand() {
             const eventReportRepository = new EventReportD2Repository(api);
             logger.debug("Fetching corrupted event reports...");
             const eventReports = await new GetCorruptedEventReports(eventReportRepository).execute();
-            eventReports.map(event => logger.info(`${JSON.stringify(event)}`));
+            eventReports.slice(-5).map(event => logger.info(`${JSON.stringify(event)}`));
         },
     });
 
