@@ -2,7 +2,7 @@ import path from "path";
 import { run, subcommands } from "cmd-ts";
 
 import * as users from "./commands/users";
-import * as eventReports from "./commands/events-reports";
+import * as eventReports from "./commands/event-reports";
 
 export function runCli() {
     const cliSubcommands = subcommands({

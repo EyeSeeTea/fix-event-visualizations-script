@@ -1,10 +1,10 @@
 import _ from "lodash";
 import { D2Api, MetadataPick } from "@eyeseetea/d2-api/2.36";
 import { Async } from "domain/entities/Async";
-import { EventReportRepository } from "domain/repositories/EventReportRepository";
+import { EventReportsRepository } from "domain/repositories/EventReportsRepository";
 import { EventReport } from "domain/entities/EventReport";
 
-export class EventReportD2Repository implements EventReportRepository {
+export class EventReportsD2Repository implements EventReportsRepository {
     constructor(private api: D2Api) {}
 
     async getAll(): Async<EventReport[]> {
@@ -17,23 +17,23 @@ export class EventReportD2Repository implements EventReportRepository {
             .getData();
     }
 
+    fixEventReports(eventReports: EventReport[]): EventReport[] {
+        return eventReports.map(ev => ({
+            ...ev,
+            dataElementDimensions: ev.dataElementDimensions.map(({ dataElement }) => ({
+                programStage: { id: ev.programStage.id },
+                dataElement,
+            })),
+        }));
+    }
+
     private buildEventReport(d2EventReport: D2EventReport): EventReport {
         return d2EventReport;
     }
 }
 
 const eventReportFields = {
-    id: true,
-    program: true,
-    programStage: true,
-    dataElementDimensions: {
-        programStage: {
-            id: true,
-        },
-        dataElement: {
-            id: true,
-        },
-    },
+    $all: true,
 } as const;
 
 type D2EventReport = MetadataPick<{
