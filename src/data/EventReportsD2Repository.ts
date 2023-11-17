@@ -27,6 +27,10 @@ export class EventReportsD2Repository implements EventReportsRepository {
         }));
     }
 
+    async save(eventReports: EventReport[]): Async<any> {
+        return [];
+    }
+
     private buildEventReport(d2EventReport: D2EventReport): EventReport {
         return d2EventReport;
     }

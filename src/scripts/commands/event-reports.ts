@@ -5,6 +5,8 @@ import { GetCorruptedEventReports } from "domain/usecases/GetCorruptedEventRepor
 import { GetFixedEventReports } from "domain/usecases/GetFixedEventReports";
 import { EventReportsD2Repository } from "data/EventReportsD2Repository";
 import logger from "utils/log";
+import { ExportCorruptedEventReports } from "domain/usecases/ExportCorruptedEventReports";
+import { EventReportsExportFileRepository } from "data/EventReportsExportRepository";
 
 export function getCommand() {
     const corruptedEventReports = command({
@@ -19,15 +21,22 @@ export function getCommand() {
         },
         handler: async args => {
             const api = getD2Api(args.url);
-            const { post } = args;
-            logger.debug("Fetching corrupted event reports...");
+            const { post: _post } = args;
+
             const eventReportsRepository = new EventReportsD2Repository(api);
+            const eventReportsExportRepository = new EventReportsExportFileRepository();
+
+            logger.debug("Fetching corrupted event reports...");
             const eventReports = await new GetCorruptedEventReports(eventReportsRepository).execute();
             const fixedEventReports = new GetFixedEventReports(eventReportsRepository).execute(eventReports);
-            await new ExportCorruptedEventReports(fixedEventReports);
-            const payload = { fixedEventReports };
             logger.info(`Corrupted Event Reports: ${eventReports.length}`);
-            logger.info(`Payload: ${JSON.stringify(payload)}`);
+
+            const outputFile = "fixed-event-reports.json";
+            new ExportCorruptedEventReports(eventReportsExportRepository).execute(
+                fixedEventReports,
+                outputFile
+            );
+            logger.info(`Written payload: ${outputFile}`);
         },
     });
 

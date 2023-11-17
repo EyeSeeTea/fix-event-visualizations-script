@@ -1,6 +1,5 @@
-import { Async } from "domain/entities/Async";
 import { EventReport } from "domain/entities/EventReport";
 
 export interface EventReportsExportRepository {
-    save(eventReports: EventReport[]): Async<void>;
+    save(eventReports: EventReport[], outputFile: string): void;
 }
