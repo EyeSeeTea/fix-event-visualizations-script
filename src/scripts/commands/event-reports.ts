@@ -7,6 +7,7 @@ import { EventReportsD2Repository } from "data/EventReportsD2Repository";
 import logger from "utils/log";
 import { ExportCorruptedEventReports } from "domain/usecases/ExportCorruptedEventReports";
 import { EventReportsExportFileRepository } from "data/EventReportsExportRepository";
+import { SaveFixedEventReports } from "domain/usecases/SaveFixedEventReports";
 
 export function getCommand() {
     const corruptedEventReports = command({
@@ -21,7 +22,7 @@ export function getCommand() {
         },
         handler: async args => {
             const api = getD2Api(args.url);
-            const { post: _post } = args;
+            const { post } = args;
 
             const eventReportsRepository = new EventReportsD2Repository(api);
             const eventReportsExportRepository = new EventReportsExportFileRepository();
@@ -37,6 +38,14 @@ export function getCommand() {
                 outputFile
             );
             logger.info(`Written payload: ${outputFile}`);
+
+            if (post) {
+                const stats = await new SaveFixedEventReports(eventReportsRepository).execute(
+                    fixedEventReports
+                );
+
+                logger.info("Stats: " + JSON.stringify(stats, null, 4));
+            }
         },
     });
 

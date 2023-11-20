@@ -7,4 +7,5 @@ export interface EventReport extends Ref {
         programStage: Ref;
         dataElement: Ref;
     }[];
+    userAccesses: Ref[];
 }
