@@ -8,6 +8,7 @@ import logger from "utils/log";
 import { ExportCorruptedEventReports } from "domain/usecases/ExportCorruptedEventReports";
 import { EventReportsExportFileRepository } from "data/EventReportsExportRepository";
 import { SaveFixedEventReports } from "domain/usecases/SaveFixedEventReports";
+import { UserD2Repository } from "data/UserD2Repository";
 
 export function getCommand() {
     const corruptedEventReports = command({
@@ -25,6 +26,7 @@ export function getCommand() {
             const { post } = args;
 
             const eventReportsRepository = new EventReportsD2Repository(api);
+            const usersRepository = new UserD2Repository(api);
             const eventReportsExportRepository = new EventReportsExportFileRepository();
 
             logger.debug("Fetching corrupted event reports...");
@@ -40,9 +42,10 @@ export function getCommand() {
             logger.info(`Written payload: ${outputFile}`);
 
             if (post) {
-                const stats = await new SaveFixedEventReports(eventReportsRepository).execute(
-                    fixedEventReports
-                );
+                const stats = await new SaveFixedEventReports(
+                    eventReportsRepository,
+                    usersRepository
+                ).execute(fixedEventReports);
 
                 logger.info("Stats: " + JSON.stringify(stats, null, 4));
             }

@@ -3,6 +3,7 @@ import { D2Api, MetadataPick } from "@eyeseetea/d2-api/2.36";
 import { Async } from "domain/entities/Async";
 import { UserRepository } from "domain/repositories/UserRepository";
 import { User } from "domain/entities/User";
+import { Id } from "domain/entities/Base";
 
 export class UserD2Repository implements UserRepository {
     constructor(private api: D2Api) {}
@@ -14,6 +15,20 @@ export class UserD2Repository implements UserRepository {
             .getData();
 
         return this.buildUser(response);
+    }
+
+    async getAllIds(): Async<Id[]> {
+        const response = await this.api.models.users
+            .get({
+                fields: {
+                    id: true,
+                },
+                paging: false,
+            })
+            .getData()
+            .then(data => data.objects.map(u => u.id));
+
+        return response;
     }
 
     private buildUser(d2User: D2User) {

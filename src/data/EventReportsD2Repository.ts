@@ -4,12 +4,19 @@ import { Async } from "domain/entities/Async";
 import { EventReportsRepository } from "domain/repositories/EventReportsRepository";
 import { EventReport } from "domain/entities/EventReport";
 import { runMetadata } from "./dhis2-utils";
+import { Id } from "domain/entities/Base";
 
 export class EventReportsD2Repository implements EventReportsRepository {
-    constructor(private api: D2Api) {}
+    constructor(private api: D2Api) {
+        // process.on("unhandledRejection", (reason, promise) => {
+        //     console.error("Unhandled Rejection at:", promise, "reason:", reason);
+        //     // You can add additional logging or error handling here
+        //     // For example, you might want to throw an error or terminate the process
+        // });
+    }
 
     async getAll(): Async<EventReport[]> {
-        return await this.api.models.eventReports
+        return this.api.models.eventReports
             .get({
                 paging: false,
                 fields: eventReportFields,
@@ -28,9 +35,8 @@ export class EventReportsD2Repository implements EventReportsRepository {
         }));
     }
 
-    async save(eventReports: EventReport[]): Async<Stats> {
-        const unvalidUsers = ["JcyDbbP2wx4", "ERQwcrANb1E", "x14stHHHIs0", "p80JEXHuxRW", "H4NqZVSOMaX"];
-        const temp = eventReports.filter(ev => ev.userAccesses.every(u => !unvalidUsers.includes(u.id)));
+    async save(eventReports: EventReport[], validUsers: Id[]): Async<Stats> {
+        const temp = eventReports.filter(ev => ev.userAccesses.every(u => validUsers.includes(u.id)));
 
         const chunks = _.chunk(temp, 100);
         const calls = chunks.map(eventReports =>
@@ -75,9 +81,6 @@ const sequentially = (promises: Promise<MetadataResponse>[]): Promise<Stats[]> =
                 acc.then(() =>
                     v.then(r => {
                         stats.push(r.stats);
-                        if (r.status !== "OK") {
-                            throw new Error(JSON.stringify(r.typeReports, null, 4));
-                        }
                     })
                 ),
             Promise.resolve()
