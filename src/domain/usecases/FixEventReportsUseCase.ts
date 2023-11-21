@@ -35,7 +35,9 @@ export class FixEventReportsUseCase {
             const invalid = compact(ev.userAccesses.map(ua => !validUsersIds.includes(ua.id) && ua.id));
             if (!isEmpty(invalid)) {
                 logger.warn(
-                    `The event report ${ev.id} had the following invalid user accesses: ${invalid.join(", ")}`
+                    `The event report ${ev.id} ${
+                        post ? "had" : "has"
+                    } the following invalid user accesses: ${invalid.join(", ")}`
                 );
                 return removeinvalidUserAccess(ev, validUsersIds);
             }
