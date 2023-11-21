@@ -1,7 +1,11 @@
 import { Struct } from "./generic/Struct";
 import { NamedRef } from "./Base";
 
-export interface UserAttrs {
+interface BasicUserAttrs {
+    id: string;
+}
+
+export interface UserAttrs extends BasicUserAttrs {
     id: string;
     name: string;
     username: string;
@@ -12,6 +16,8 @@ export interface UserAttrs {
 export interface UserRole extends NamedRef {
     authorities: string[];
 }
+
+export type BasicUser = BasicUserAttrs;
 
 export class User extends Struct<UserAttrs>() {
     belongToUserGroup(userGroupUid: string): boolean {

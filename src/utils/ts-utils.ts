@@ -1,5 +1,3 @@
-import _ from "lodash";
-
 export type Maybe<T> = T | undefined;
 
 export type Expand<T> = {} & { [P in keyof T]: T[P] };
@@ -71,16 +69,6 @@ export function getKeys<K extends string>(obj: Record<K, unknown>): K[] {
     return Object.keys(obj) as K[];
 }
 
-/* idRecordOf: Similar to recordOf, but use to add an id field from the object key */
-
-type AddId<T> = Expand<{ [K in keyof T]: T[K] & { id: K } }>;
-
-export function idRecordOf<T>() {
-    return function <Obj extends Record<string, Omit<T, "id">>>(obj: Obj): AddId<Obj> {
-        return _.mapValues(obj, (value: Omit<T, "id">, id) => ({ ...value, id })) as AddId<Obj>;
-    };
-}
-
 export type GetRecordId<T extends Record<any, { id: unknown }>> = GetValue<T>["id"];
 
 export function fromPairs<Key extends string, Value>(pairs: Array<[Key, Value]>): Record<Key, Value> {
@@ -103,11 +91,5 @@ export type RecursivePartial<T> = {
         ? RecursivePartial<T[P]>
         : T[P];
 };
-
-export function invertMapping<Key extends string, Value extends string>(
-    mapping: Record<Key, Value>
-): Record<Value, Key | undefined> {
-    return _.invert(mapping) as Record<Value, Key | undefined>;
-}
 
 export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
