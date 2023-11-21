@@ -11,7 +11,7 @@
                 "prettify": "prettier \"./**/*.{js,jsx,json,css,ts,tsx}\" --write"
         },
         "author": "EyeSeeTea <info@eyeseetea.com>",
-        "license": "MIT",
+        "license": "GPL",
         "dependencies": {
                 "@eyeseetea/d2-api": "1.14.0",
                 "cmd-ts": "0.13.0",
