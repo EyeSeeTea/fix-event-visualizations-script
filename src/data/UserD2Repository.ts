@@ -2,7 +2,7 @@ import _ from "lodash";
 import { D2Api, MetadataPick } from "@eyeseetea/d2-api/2.36";
 import { Async } from "domain/entities/Async";
 import { UserRepository } from "domain/repositories/UserRepository";
-import { User } from "domain/entities/User";
+import { BasicUser, User } from "domain/entities/User";
 import { promiseMap } from "./dhis2-utils";
 
 export class UserD2Repository implements UserRepository {
@@ -17,10 +17,10 @@ export class UserD2Repository implements UserRepository {
         return this.buildUser(response);
     }
 
-    async getAll(): Async<User[]> {
+    async getAll(): Async<BasicUser[]> {
         const { objects: firstPageUsers, pager } = await this.api.models.users
             .get({
-                fields: userFields,
+                fields: { id: true },
                 pageSize: 1_000,
             })
             .getData();
@@ -28,7 +28,7 @@ export class UserD2Repository implements UserRepository {
         const users = await promiseMap([...Array(pager.pageCount - 1).keys()], page =>
             this.api.models.users
                 .get({
-                    fields: userFields,
+                    fields: { id: true },
                     page: page + 2,
                     pageSize: 1_000,
                 })
@@ -36,7 +36,7 @@ export class UserD2Repository implements UserRepository {
                 .then(data => data.objects)
         ).then(users => [firstPageUsers, ...users].flat());
 
-        return users.map(user => this.buildUser(user));
+        return users;
     }
 
     private buildUser(d2User: D2User) {
