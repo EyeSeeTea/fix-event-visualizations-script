@@ -3,6 +3,7 @@ import { run, subcommands } from "cmd-ts";
 
 import * as users from "./commands/users";
 import * as eventReports from "./commands/event-reports";
+import * as eventCharts from "./commands/event-charts";
 
 export function runCli() {
     const cliSubcommands = subcommands({
@@ -10,6 +11,7 @@ export function runCli() {
         cmds: {
             users: users.getCommand(),
             eventReports: eventReports.getCommand(),
+            eventCharts: eventCharts.getCommand(),
         },
     });
 

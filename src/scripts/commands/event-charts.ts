@@ -2,14 +2,14 @@ import _ from "lodash";
 import { command, flag, subcommands } from "cmd-ts";
 import { getApiUrlOptions, getD2Api } from "scripts/common";
 import { UserD2Repository } from "data/UserD2Repository";
-import { FixEventReportsUseCase } from "domain/usecases/FixEventReportsUseCase";
-import { EventReportD2Repository } from "data/EventReportD2Repository";
+import { FixEventChartsUseCase } from "domain/usecases/FixEventChartsUseCase";
+import { EventChartD2Repository } from "data/EventChartD2Repository";
 import { ExportFileRepository } from "data/ExportFileRepository";
 
 export function getCommand() {
-    const corruptedEventReports = command({
-        name: "corrupted event reports",
-        description: "get corrupted event reports",
+    const corruptedEventCharts = command({
+        name: "corrupted event charts",
+        description: "get corrupted event charts",
         args: {
             ...getApiUrlOptions(),
             post: flag({
@@ -20,19 +20,19 @@ export function getCommand() {
         handler: async args => {
             const api = getD2Api(args.url);
             const { post } = args;
-            const eventReportRepository = new EventReportD2Repository(api);
+            const eventChartRepository = new EventChartD2Repository(api);
             const userRepository = new UserD2Repository(api);
-            const eventReportExportRepository = new ExportFileRepository();
-            await new FixEventReportsUseCase(
-                eventReportRepository,
-                eventReportExportRepository,
+            const eventChartExportRepository = new ExportFileRepository();
+            await new FixEventChartsUseCase(
+                eventChartRepository,
+                eventChartExportRepository,
                 userRepository
             ).execute(post);
         },
     });
 
     return subcommands({
-        name: "event-reports",
-        cmds: { fixCorrupted: corruptedEventReports },
+        name: "event-charts",
+        cmds: { fixCorrupted: corruptedEventCharts },
     });
 }

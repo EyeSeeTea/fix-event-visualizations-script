@@ -3,7 +3,7 @@ import { D2Api, MetadataPick } from "@eyeseetea/d2-api/2.36";
 import { Async } from "domain/entities/Async";
 import { UserRepository } from "domain/repositories/UserRepository";
 import { User } from "domain/entities/User";
-import { Id } from "domain/entities/Base";
+import { promiseMap } from "./dhis2-utils";
 
 export class UserD2Repository implements UserRepository {
     constructor(private api: D2Api) {}
@@ -17,18 +17,26 @@ export class UserD2Repository implements UserRepository {
         return this.buildUser(response);
     }
 
-    async getAllIds(): Async<Id[]> {
-        const response = await this.api.models.users
+    async getAll(): Async<User[]> {
+        const { objects: firstPageUsers, pager } = await this.api.models.users
             .get({
-                fields: {
-                    id: true,
-                },
-                paging: false,
+                fields: userFields,
+                pageSize: 1_000,
             })
-            .getData()
-            .then(data => data.objects.map(u => u.id));
+            .getData();
 
-        return response;
+        const users = await promiseMap([...Array(pager.pageCount - 1).keys()], page =>
+            this.api.models.users
+                .get({
+                    fields: userFields,
+                    page: page + 2,
+                    pageSize: 1_000,
+                })
+                .getData()
+                .then(data => data.objects)
+        ).then(users => [firstPageUsers, ...users].flat());
+
+        return users.map(user => this.buildUser(user));
     }
 
     private buildUser(d2User: D2User) {
