@@ -1,8 +1,8 @@
 {
-        "name": "dhis2-script-skeleton",
+        "name": "fix-event-visualizations-script",
         "version": "0.1.0",
         "main": "src/index.ts",
-        "description": "DHIS2 script skeleton",
+        "description": "Fix event visualizations script",
         "scripts": {
                 "build:dev": "webpack --mode development --watch",
                 "build": "webpack --mode production",
@@ -10,7 +10,7 @@
                 "start": "node dist/index.js",
                 "prettify": "prettier \"./**/*.{js,jsx,json,css,ts,tsx}\" --write"
         },
-        "author": "EyeSeeTea <arnau@eyeseetea.com>",
+        "author": "EyeSeeTea <info@eyeseetea.com>",
         "license": "MIT",
         "dependencies": {
                 "@eyeseetea/d2-api": "1.14.0",
