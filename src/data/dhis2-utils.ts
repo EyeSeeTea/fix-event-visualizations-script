@@ -2,20 +2,21 @@ import { HttpResponse } from "@eyeseetea/d2-api/api/common";
 import { EventsPostResponse } from "@eyeseetea/d2-api/api/events";
 import { CancelableResponse } from "@eyeseetea/d2-api/repositories/CancelableResponse";
 import { Id } from "domain/entities/Base";
-import _ from "lodash";
+import _ from "./../domain/entities/generic/Collection";
 import { MetadataResponse } from "../types/d2-api";
 import log from "utils/log";
 
 export function getErrorFromResponse(res: MetadataResponse): string {
     console.debug(JSON.stringify(res, null, 4));
 
-    return _(res.typeReports || [])
+    const responseTypeReports = res.typeReports || [];
+
+    const errors = responseTypeReports
         .flatMap(typeReport => typeReport.objectReports || [])
         .flatMap(objectReport => objectReport.errorReports || [])
-        .flatMap(errorReport => errorReport.message)
-        .compact()
-        .uniq()
-        .join("\n");
+        .flatMap(errorReport => errorReport.message);
+
+    return _(errors).compact().uniq().join("\n");
 }
 
 export async function runMetadata(
@@ -33,10 +34,9 @@ export function checkPostEventsResponse(res: HttpResponse<EventsPostResponse>): 
     const importMessages = _(res.response.importSummaries || [])
         .map(importSummary =>
             importSummary.status !== "SUCCESS"
-                ? _.compact([
-                      importSummary.description,
-                      ...importSummary.conflicts.map(c => JSON.stringify(c)),
-                  ]).join("\n")
+                ? _([importSummary.description, ...importSummary.conflicts.map(c => JSON.stringify(c))])
+                      .compact()
+                      .join("\n")
                 : null
         )
         .compact()
@@ -49,8 +49,8 @@ export function checkPostEventsResponse(res: HttpResponse<EventsPostResponse>): 
 }
 
 export async function getInChunks<T>(ids: Id[], getter: (idsGroup: Id[]) => Promise<T[]>): Promise<T[]> {
-    const objsCollection = await promiseMap(_.chunk(ids, 300), idsGroup => getter(idsGroup));
-    return _.flatten(objsCollection);
+    const objsCollection = await promiseMap(_(ids).chunk(300).value(), idsGroup => getter(idsGroup));
+    return _(objsCollection).flatten().value();
 }
 
 export function promiseMap<T, S>(inputValues: T[], mapper: (value: T) => Promise<S>): Promise<S[]> {
