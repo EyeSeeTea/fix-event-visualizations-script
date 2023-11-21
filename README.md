@@ -30,3 +30,23 @@ shell:~$ LOG_LEVEL=debug yarn start users
 ```
 
 Available levels: 'debug' | 'info' | 'warn' | 'error'
+
+## Fix Event Reports
+
+Fix corrupted event reports, show the number of event reports that will be updated. Add option `--post` to apply changes.
+
+```console
+shell:~$ yarn start eventReports fixCorrupted \
+  --url='http://USER:PASSWORD@HOST:PORT'
+  [--post]
+```
+
+## Fix Event Charts
+
+Fix corrupted event charts, show the number of event charts that will be updated. Add option `--post` to apply changes.
+
+```console
+shell:~$ yarn start eventCharts fixCorrupted \
+  --url='http://USER:PASSWORD@HOST:PORT'
+  [--post]
+```
